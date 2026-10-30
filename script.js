@@ -64,3 +64,18 @@ function initContact(){
     if(n.length<2||m.length<5){er.textContent="Please add your name and a short message.";return}er.textContent="";
     window.open(`https://wa.me/${WA}?text=${encodeURIComponent(`Hello Blush Studio, this is ${n}.\n${m}`)}`,"_blank","noopener");});
 }
+// ---- v2 motion: scroll progress, parallax, staggered reveals, magnetic buttons, page fade ----
+document.addEventListener("DOMContentLoaded",()=>{
+  const bar=document.querySelector(".progress"),par=[...document.querySelectorAll("[data-speed]")];
+  const reduce=matchMedia("(prefers-reduced-motion:reduce)").matches;
+  let tick=false;const onScroll=()=>{if(tick)return;tick=true;requestAnimationFrame(()=>{const h=document.documentElement.scrollHeight-innerHeight;bar&&(bar.style.transform=`scaleX(${h>0?scrollY/h:0})`);
+    if(!reduce)par.forEach(el=>el.style.translate=`0 ${scrollY*el.dataset.speed}px`);tick=false})};
+  addEventListener("scroll",onScroll,{passive:true});onScroll();
+  document.querySelectorAll(".grid").forEach(g=>[...g.children].forEach((c,i)=>c.classList.contains("reveal")&&c.classList.add("d"+(i%4))));
+  if(matchMedia("(pointer:fine)").matches&&!reduce)document.querySelectorAll(".btn").forEach(b=>{
+    b.addEventListener("mousemove",e=>{const r=b.getBoundingClientRect();b.style.transform=`translate(${(e.clientX-r.left-r.width/2)*.2}px,${(e.clientY-r.top-r.height/2)*.3}px)`});
+    b.addEventListener("mouseleave",()=>b.style.transform="")});
+  document.addEventListener("click",e=>{const a=e.target.closest("a");if(!a||a.target||e.metaKey||e.ctrlKey)return;const h=a.getAttribute("href");
+    if(!h||/^(#|http|mailto|tel)/.test(h))return;e.preventDefault();document.body.style.transition="opacity .35s";document.body.style.opacity=0;setTimeout(()=>location.href=h,320)});
+  addEventListener("pageshow",e=>{if(e.persisted)document.body.style.opacity=1});
+});
